@@ -1,9 +1,37 @@
 #include<iostream>
+#include<vector>
+#include<utility>
 #include<fstream>
 
 #define ll long long 
 
 using namespace std ;
+
+class Node{
+  public:
+    char character ;
+    int freq ;
+    Node* l;
+    Node* r;
+
+    Node(char c ,int f){
+      character = c;
+      freq = f;
+      l = r = nullptr;
+    }
+};
+
+class MinHeap{
+  public:
+    int size ;
+    vector<Node*> array ;
+
+    MinHeap(int s){
+      size = s ;
+      array.resize(s);
+    }
+
+};
 
 double convert_bytes_to_mb(ll);
 void find_file_size(ifstream&);
@@ -26,6 +54,7 @@ int main(int argc , char** argv){
 double convert_bytes_to_mb(ll bytes){
   return ((double)bytes / 1000000);
 }
+
 void find_file_size(ifstream& file){
   file.seekg(0 , ios::end);
   ll size = file.tellg();
