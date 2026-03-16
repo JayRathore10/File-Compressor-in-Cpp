@@ -5,7 +5,8 @@
 
 using namespace std ;
 
-double convertByteToMB(ll);
+double convert_bytes_to_mb(ll);
+void find_file_size(ifstream&);
 
 int main(int argc , char** argv){
   cout<<"File compressor"<<endl;
@@ -16,15 +17,18 @@ int main(int argc , char** argv){
     return 0;
   }
 
-  file.seekg(0 , ios::end);
-  ll size = file.tellg();
-
-  cout<<"File size : "<<(convertByteToMB(size))<<endl;
+  find_file_size(file);
 
   file.close();
   return 0; 
 }
 
-double convertByteToMB(ll bytes){
+double convert_bytes_to_mb(ll bytes){
   return ((double)bytes / 1000000);
+}
+void find_file_size(ifstream& file){
+  file.seekg(0 , ios::end);
+  ll size = file.tellg();
+
+  cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
 }
