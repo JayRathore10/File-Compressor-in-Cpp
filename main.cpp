@@ -6,7 +6,10 @@
 #define ll long long 
 
 using namespace std ;
-
+/**
+ *  [character , freq] + (left  , right)
+ * 
+ */
 class Node{
   public:
     char character ;
@@ -35,6 +38,8 @@ class MinHeap{
 
 double convert_bytes_to_mb(ll);
 void find_file_size(ifstream&);
+MinHeap* build_MinHeap(char[] , int[] , int);
+void Heapify(MinHeap* ,int ,  int);
 
 int main(int argc , char** argv){
   cout<<"File compressor"<<endl;
@@ -60,4 +65,41 @@ void find_file_size(ifstream& file){
   ll size = file.tellg();
 
   cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
+}
+
+MinHeap* build_MinHeap(char arr[] , int freq[] , int unique_size){
+  int i;
+  MinHeap* minHeap = new MinHeap(unique_size);
+
+  for(int i  = 0 ;  i < unique_size ; i++){
+    minHeap->array[i] = new Node(arr[i] , freq[i]);
+  }
+
+  int n = minHeap->size - 1;
+  for(int i = (n - 1) / 2 ; i >= 0 ; i--){
+    Heapify(minHeap , i);
+  }
+
+  return minHeap;
+
+}
+
+void Heapify(MinHeap* minHeap  ,int n, int i){
+  int smallest = i ;
+  int l = 2 * i + 1;
+  int r = 2 * i + 2;
+
+  if(l < n && minHeap->array[l] < minHeap->array[smallest]){
+    smallest = l;
+  }
+
+  if(r < n && minHeap->array[r] < minHeap->array[smallest]){
+    smallest = r;
+  }
+
+  if(i != smallest){
+    swap(minHeap->array[i] , minHeap->array[smallest]);
+    Heapify(minHeap , n , smallest);
+  }
+
 }
