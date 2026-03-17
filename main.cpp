@@ -7,7 +7,8 @@
 
 using namespace std ;
 /**
- *  [character , freq] + (left  , right)
+ * node = {[character , freq] + (left  , right)}
+ * make a min heap that consist of this node
  * 
  */
 class Node{
@@ -39,6 +40,7 @@ class MinHeap{
 double convert_bytes_to_mb(ll);
 void find_file_size(ifstream&);
 MinHeap* build_MinHeap(char[] , int[] , int);
+// for min heap 
 void Heapify(MinHeap* ,int ,  int);
 Node* build_huffmanTree(char[] , int[] , int);
 
