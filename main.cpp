@@ -40,6 +40,7 @@ double convert_bytes_to_mb(ll);
 void find_file_size(ifstream&);
 MinHeap* build_MinHeap(char[] , int[] , int);
 void Heapify(MinHeap* ,int ,  int);
+Node* build_huffmanTree(char[] , int[] , int);
 
 int main(int argc , char** argv){
   cout<<"File compressor"<<endl;
@@ -77,7 +78,7 @@ MinHeap* build_MinHeap(char arr[] , int freq[] , int unique_size){
 
   int n = minHeap->size - 1;
   for(int i = (n - 1) / 2 ; i >= 0 ; i--){
-    Heapify(minHeap , i);
+    Heapify(minHeap , n , i);
   }
 
   return minHeap;
