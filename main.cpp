@@ -1,108 +1,77 @@
 #include<iostream>
 #include<vector>
-#include<utility>
+#include<unordered_map>
+#include<queue>
 #include<fstream>
 
-#define ll long long 
-
 using namespace std ;
-/**
- * node = {[character , freq] + (left  , right)}
- * make a min heap that consist of this node
- * 
- */
-class Node{
-  public:
-    char character ;
-    int freq ;
-    Node* l;
-    Node* r;
 
-    Node(char c ,int f){
-      character = c;
-      freq = f;
-      l = r = nullptr;
-    }
+struct Node{
+  char ch ;
+  int freq ;
+  Node* left ;
+  Node* right;
+
+  Node(char c , int f){
+    ch = c;
+    freq = f;
+    left = right = NULL;
+  }
 };
 
-class MinHeap{
-  public:
-    int size ;
-    vector<Node*> array ;
-
-    MinHeap(int s){
-      size = s ;
-      array.resize(s);
-    }
-
+struct Compare {
+  bool operator()(Node* a , Node* b){
+    return a->freq > b->freq;
+  }
 };
 
-double convert_bytes_to_mb(ll);
-void find_file_size(ifstream&);
-MinHeap* build_MinHeap(char[] , int[] , int);
-// for min heap 
-void Heapify(MinHeap* ,int ,  int);
-Node* build_huffmanTree(char[] , int[] , int);
+Node* buildTree(unordered_map<char , int>& freq){
+  priority_queue<Node* , vector<Node*> , Compare> pq;
+
+  for(auto& p : freq){
+    pq.push(new Node(p.first , p.second));
+  }
+
+  while(pq.size() > 1){
+    Node* left = pq.top() ; pq.pop();
+    Node* right = pq.top() ; pq.pop();
+
+    Node* merged = new Node('\0' , left->freq + right->freq);
+    merged->left = left;
+    merged->right = right;
+
+    pq.push(merged);
+
+  }
+  return pq.top();
+}
+
+void generateCodes(Node* root , string code , unordered_map<char , string>& huff){
+  if(!root) return ;
+
+  if(root->ch != '\0'){
+    huff[root->ch] = code;
+  }
+
+  generateCodes(root->left , code + "0" , huff);
+  generateCodes(root->right , code + "1" , huff);
+
+}
+
+string encode (string text , unordered_map<char ,string>& huff){
+  string res = "";
+  for(char c : text){
+    res += huff[c];
+  }
+
+  return res;
+}
+
 
 int main(int argc , char** argv){
-  cout<<"File compressor"<<endl;
-  ifstream file("sample.txt");
+  ifstream in("sample.txt");
+  string text((istreambuf_iterator<char>(in)) , istreambuf_iterator<char>());
 
-  if(!file){
-    cout<<"Error in file opening"<<endl;
-    return 0;
-  }
-
-  find_file_size(file);
-
-  file.close();
-  return 0; 
-}
-
-double convert_bytes_to_mb(ll bytes){
-  return ((double)bytes / 1000000);
-}
-
-void find_file_size(ifstream& file){
-  file.seekg(0 , ios::end);
-  ll size = file.tellg();
-
-  cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
-}
-
-MinHeap* build_MinHeap(char arr[] , int freq[] , int unique_size){
-  int i;
-  MinHeap* minHeap = new MinHeap(unique_size);
-
-  for(int i  = 0 ;  i < unique_size ; i++){
-    minHeap->array[i] = new Node(arr[i] , freq[i]);
-  }
-
-  int n = minHeap->size - 1;
-  for(int i = (n - 1) / 2 ; i >= 0 ; i--){
-    Heapify(minHeap , n , i);
-  }
-
-  return minHeap;
-
-}
-
-void Heapify(MinHeap* minHeap  ,int n, int i){
-  int smallest = i ;
-  int l = 2 * i + 1;
-  int r = 2 * i + 2;
-
-  if(l < n && minHeap->array[l] < minHeap->array[smallest]){
-    smallest = l;
-  }
-
-  if(r < n && minHeap->array[r] < minHeap->array[smallest]){
-    smallest = r;
-  }
-
-  if(i != smallest){
-    swap(minHeap->array[i] , minHeap->array[smallest]);
-    Heapify(minHeap , n , smallest);
-  }
-
+  ofstream out("compressed.txt");
+  return 0;
 }
