@@ -85,6 +85,31 @@ void find_file_size(ofstream& file){
   cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
 }
 
+void writeCompressed(string encoded , ofstream& out){
+  char byte = 0;
+  int bitCount = 0;
+
+  for(char bit : encoded){
+    byte <<= 1;
+
+    if(bit == '1') byte |= 1;
+
+    bitCount++;
+
+    if(bitCount == 8){
+      out.put(byte);
+      byte = 0;
+      bitCount = 0;
+    }
+  }
+
+  if(bitCount > 0){
+    byte <<= (8  - bitCount);
+    out.put(byte);
+  }
+
+}
+
 int main(int argc , char** argv){
   
   ifstream in("sample.txt");
@@ -110,7 +135,7 @@ int main(int argc , char** argv){
   string encodeText = encode(text ,huff);
 
   ofstream out("compressed.txt");
-  out << encodeText;
+  writeCompressed(encodeText , out);
 
   cout<<"Compressed successfull"<<endl;
   cout<<"Before : ";
