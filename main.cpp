@@ -85,9 +85,10 @@ void find_file_size(ofstream& file){
   cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
 }
 
-void writeCompressed(string encoded , ofstream& out){
+int writeCompressed(string encoded , ofstream& out){
   char byte = 0;
   int bitCount = 0;
+  int totalBits = 0;
 
   for(char bit : encoded){
     byte <<= 1;
@@ -95,6 +96,7 @@ void writeCompressed(string encoded , ofstream& out){
     if(bit == '1') byte |= 1;
 
     bitCount++;
+    totalBits++;
 
     if(bitCount == 8){
       out.put(byte);
@@ -107,7 +109,7 @@ void writeCompressed(string encoded , ofstream& out){
     byte <<= (8  - bitCount);
     out.put(byte);
   }
-
+  return totalBits;
 }
 
 void writeFreqMap(ofstream& out , unordered_map<char , int>& freq){
@@ -173,9 +175,11 @@ int main(int argc , char** argv){
   generateCodes(root ,"" , huff);
 
   string encodeText = encode(text ,huff);
+  int totalBits = encodeText.size();
 
   ofstream out("compressed.txt"  , ios::binary);
   writeFreqMap(out , freq);
+  out<<totalBits<<"\n";
   writeCompressed(encodeText , out);
 
   cout<<"Compressed successfull"<<endl;
@@ -194,13 +198,18 @@ int main(int argc , char** argv){
   }
 
   auto freqC = readFreqMap(inc);
+  int tb;
+  inc >> tb;
+  inc.get();
   auto rootC = buildTree(freqC);
 
   string bits =  "";
 
   char byte ;
+  inc.clear();
   while(inc.get(byte)){
     for(int i = 7 ; i >= 0 ;i--){
+      if(bits.size() == tb) break;
       bits  += ((byte >> i) & 1)? '1' : '0';
     }
   }
