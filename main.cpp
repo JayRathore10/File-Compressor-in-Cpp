@@ -110,6 +110,14 @@ void writeCompressed(string encoded , ofstream& out){
 
 }
 
+void writeFreqMap(ofstream& out , unordered_map<char , int>& freq){
+  out<< freq.size() << "\n";
+
+  for(auto& p : freq){
+    out<< p.first <<" "<< p.second<<"\n";
+  }
+}
+
 int main(int argc , char** argv){
   
   ifstream in("sample.txt");
@@ -134,7 +142,8 @@ int main(int argc , char** argv){
 
   string encodeText = encode(text ,huff);
 
-  ofstream out("compressed.txt");
+  ofstream out("compressed.txt"  , ios::binary);
+  writeFreqMap(out , freq);
   writeCompressed(encodeText , out);
 
   cout<<"Compressed successfull"<<endl;
