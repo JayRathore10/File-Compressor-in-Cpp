@@ -67,11 +67,39 @@ string encode (string text , unordered_map<char ,string>& huff){
   return res;
 }
 
-
 int main(int argc , char** argv){
+  
   ifstream in("sample.txt");
+
+  if(!in){
+    cout<<"Error in opening input file"<<endl;
+    return 1;
+  }
+
   string text((istreambuf_iterator<char>(in)) , istreambuf_iterator<char>());
 
+  unordered_map<char , int> freq;
+  for(char c : text){
+    freq[c]++;
+  }
+
+
+  Node* root = buildTree(freq);
+
+  unordered_map<char, string> huff;
+  generateCodes(root ,"" , huff);
+
+  cout<<"Huffman Code: "<<endl;
+  for(auto &p : huff){
+    cout<<p.first<<" : "<<p.second<<endl;
+  }
+
+  string encodeText = encode(text ,huff);
+
   ofstream out("compressed.txt");
+  out << encodeText;
+
+  cout<<"Compressed successfull"<<endl;
+
   return 0;
 }
