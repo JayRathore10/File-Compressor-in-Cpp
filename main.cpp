@@ -118,6 +118,38 @@ void writeFreqMap(ofstream& out , unordered_map<char , int>& freq){
   }
 }
 
+unordered_map<char ,int> readFreqMap(ifstream& in){
+  int n ;
+  in >> n;
+
+  unordered_map<char , int> freq;
+
+  for(int i = 0 ;i < n; i++){
+    char ch ;
+    int f;
+    in >> ch >> f;
+    freq[ch] = f;
+  }
+
+  return freq;
+}
+
+string decoded(string& bits  , Node* root){
+  string result = "";
+  Node* curr = root;
+
+  for(char bit : bits){
+    if(bit == '0') curr = curr->left;
+    else curr = curr->right;
+
+    if(!curr->left && !curr->right){
+      result += curr->ch;
+      curr = root;
+    }
+  }
+  return result;
+}
+
 int main(int argc , char** argv){
   
   ifstream in("sample.txt");
@@ -151,6 +183,35 @@ int main(int argc , char** argv){
   find_file_size(in);
   cout<<"After  : ";
   find_file_size(out);
+
+  cout<<endl<<endl;
+
+  ifstream inc("compressed.txt" , ios :: binary);
+
+  if(!inc){
+    cout<<"Error opening compressed file"<<"\n";
+    return 1;
+  }
+
+  auto freqC = readFreqMap(inc);
+  auto rootC = buildTree(freqC);
+
+  string bits =  "";
+
+  char byte ;
+  while(inc.get(byte)){
+    for(int i = 7 ; i >= 0 ;i--){
+      bits  += ((byte >> i) & 1)? '1' : '0';
+    }
+  }
+
+  string decodedText = decoded(bits , rootC);
+
+  ofstream outD("decoded.txt");
+  outD<< decodedText;
+
+  cout<<"Decoded successfully"<<endl;;
+  find_file_size(outD);
 
   return 0;
 }
