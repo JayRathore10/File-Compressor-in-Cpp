@@ -67,6 +67,24 @@ string encode (string text , unordered_map<char ,string>& huff){
   return res;
 }
 
+double convert_bytes_to_mb(long long bytes){
+  return ((double)bytes / 1000000);
+}
+
+void find_file_size(ifstream& file){
+  file.seekg(0 , ios::end);
+  long long size = file.tellg();
+
+  cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
+}
+
+void find_file_size(ofstream& file){
+  file.seekp(0 , ios::end);
+  long long size = file.tellp();
+
+  cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
+}
+
 int main(int argc , char** argv){
   
   ifstream in("sample.txt");
@@ -89,17 +107,16 @@ int main(int argc , char** argv){
   unordered_map<char, string> huff;
   generateCodes(root ,"" , huff);
 
-  cout<<"Huffman Code: "<<endl;
-  for(auto &p : huff){
-    cout<<p.first<<" : "<<p.second<<endl;
-  }
-
   string encodeText = encode(text ,huff);
 
   ofstream out("compressed.txt");
   out << encodeText;
 
   cout<<"Compressed successfull"<<endl;
+  cout<<"Before : ";
+  find_file_size(in);
+  cout<<"After  : ";
+  find_file_size(out);
 
   return 0;
 }
