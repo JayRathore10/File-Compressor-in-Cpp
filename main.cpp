@@ -20,6 +20,85 @@ struct Compare{
     }
 };
 
+Node* buildTree(unordered_map<char ,int>& freq);
+
+void generateCodes(Node* root,string code,unordered_map<char,string>& huff);
+
+string encode(string text,unordered_map<char,string>& huff);
+
+int writeCompressed(string encoded,ofstream& out);
+
+void writeFreqMap(ofstream& out,unordered_map<char,int>& freq);
+
+unordered_map<char,int> readFreqMap(ifstream& in);
+
+string decode(string& bits,Node* root);
+
+double convert_bytes_to_mb(long long bytes);
+
+void find_file_size(ifstream& file);
+
+void find_file_size(ofstream& file);
+
+int main(){
+    ifstream in("sample.txt");
+    if(!in) return 1;
+
+    string text((istreambuf_iterator<char>(in)),istreambuf_iterator<char>());
+
+    unordered_map<char,int> freq;
+    for(char c:text) freq[c]++;
+
+    Node* root=buildTree(freq);
+
+    unordered_map<char,string> huff;
+    generateCodes(root,"",huff);
+
+    string encodedText=encode(text,huff);
+
+    ofstream out("compressed.bin",ios::binary);
+    writeFreqMap(out,freq);
+    out<<encodedText.size()<<"\n";
+    writeCompressed(encodedText,out);
+
+    find_file_size(in);
+    find_file_size(out);
+
+    in.close();
+    out.close();
+
+    ifstream inc("compressed.bin",ios::binary);
+
+    auto freqC=readFreqMap(inc);
+
+    int totalBits;
+    inc>>totalBits;
+    inc.get();
+
+    Node* rootC=buildTree(freqC);
+
+    string bits="";
+    char byte;
+
+    while(inc.get(byte)){
+        for(int i=7;i>=0;i--){
+            if(bits.size()==totalBits) break;
+            bits+=((byte>>i)&1)?'1':'0';
+        }
+    }
+
+    string decodedText=decode(bits,rootC);
+
+    ofstream outD("decoded.txt");
+    outD<<decodedText;
+
+    find_file_size(outD);
+
+    return 0;
+}
+
+
+
 Node* buildTree(unordered_map<char,int>& freq){
     vector<pair<char,int>> arr(freq.begin(), freq.end());
     sort(arr.begin(), arr.end());
@@ -125,61 +204,4 @@ void find_file_size(ofstream& file){
   long long size = file.tellp();
 
   cout<<"File size : "<<(convert_bytes_to_mb(size))<<endl;
-}
-
-int main(){
-    ifstream in("sample.txt");
-    if(!in) return 1;
-
-    string text((istreambuf_iterator<char>(in)),istreambuf_iterator<char>());
-
-    unordered_map<char,int> freq;
-    for(char c:text) freq[c]++;
-
-    Node* root=buildTree(freq);
-
-    unordered_map<char,string> huff;
-    generateCodes(root,"",huff);
-
-    string encodedText=encode(text,huff);
-
-    ofstream out("compressed.bin",ios::binary);
-    writeFreqMap(out,freq);
-    out<<encodedText.size()<<"\n";
-    writeCompressed(encodedText,out);
-
-    find_file_size(in);
-    find_file_size(out);
-
-    in.close();
-    out.close();
-
-    ifstream inc("compressed.bin",ios::binary);
-
-    auto freqC=readFreqMap(inc);
-
-    int totalBits;
-    inc>>totalBits;
-    inc.get();
-
-    Node* rootC=buildTree(freqC);
-
-    string bits="";
-    char byte;
-
-    while(inc.get(byte)){
-        for(int i=7;i>=0;i--){
-            if(bits.size()==totalBits) break;
-            bits+=((byte>>i)&1)?'1':'0';
-        }
-    }
-
-    string decodedText=decode(bits,rootC);
-
-    ofstream outD("decoded.txt");
-    outD<<decodedText;
-
-    find_file_size(outD);
-
-    return 0;
 }
