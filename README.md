@@ -10,6 +10,16 @@ Huffman Coding is a lossless data compression algorithm that assigns variable-le
 
 ---
 
+## Screenshots
+
+### Compression Output
+![Compression](screenshots/image.png)
+
+### Decompression Output
+![Decompression](screenshots/image2.png)
+
+---
+
 ## Features
 
 - Builds a Huffman Tree using character frequencies  
@@ -23,10 +33,11 @@ Huffman Coding is a lossless data compression algorithm that assigns variable-le
 
 ## File Structure
 ```
-├── sample.txt # Input file
-├── compressed.bin # Compressed binary output
-├── decoded.txt # Decompressed output
-├── main.cpp # Source code
+├── screenshots/
+│   ├── image.png
+│   ├── image2.png
+├── main.cpp
+├── README.md
 ```
 
 ---
