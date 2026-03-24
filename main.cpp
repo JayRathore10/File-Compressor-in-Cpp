@@ -95,6 +95,7 @@ int main() {
         cout << "Compressed file saved at: " << outPath << endl;
 
         find_file_size(in);
+        cout<<"Compressed ";
         find_file_size(out);
 
         in.close();
