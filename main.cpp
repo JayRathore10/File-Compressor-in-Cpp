@@ -40,64 +40,118 @@ void find_file_size(ifstream& file);
 
 void find_file_size(ofstream& file);
 
-int main(){
-    ifstream in("sample.txt");
-    if(!in) return 1;
+int main() {
+    int choice;
+    cout << "1. Compress File\n2. Decompress File\nEnter choice: ";
+    cin >> choice;
 
-    string text((istreambuf_iterator<char>(in)),istreambuf_iterator<char>());
+    string filePath;
+    cout << "Enter file path: ";
+    cin.ignore();
+    getline(cin, filePath);
 
-    unordered_map<char,int> freq;
-    for(char c:text) freq[c]++;
+    string dir = "";
+    string filename = filePath;
 
-    Node* root=buildTree(freq);
-
-    unordered_map<char,string> huff;
-    generateCodes(root,"",huff);
-
-    string encodedText=encode(text,huff);
-
-    ofstream out("compressed.bin",ios::binary);
-    writeFreqMap(out,freq);
-    out<<encodedText.size()<<"\n";
-    writeCompressed(encodedText,out);
-
-    find_file_size(in);
-    find_file_size(out);
-
-    in.close();
-    out.close();
-
-    ifstream inc("compressed.bin",ios::binary);
-
-    auto freqC=readFreqMap(inc);
-
-    int totalBits;
-    inc>>totalBits;
-    inc.get();
-
-    Node* rootC=buildTree(freqC);
-
-    string bits="";
-    char byte;
-
-    while(inc.get(byte)){
-        for(int i=7;i>=0;i--){
-            if(bits.size()==totalBits) break;
-            bits+=((byte>>i)&1)?'1':'0';
-        }
+    int pos = filePath.find_last_of("/\\");
+    if (pos != string::npos) {
+        dir = filePath.substr(0, pos + 1);
+        filename = filePath.substr(pos + 1);
     }
 
-    string decodedText=decode(bits,rootC);
+    string nameOnly = filename;
+    int dotPos = filename.find_last_of('.');
+    if (dotPos != string::npos) {
+        nameOnly = filename.substr(0, dotPos);
+    }
 
-    ofstream outD("decoded.txt");
-    outD<<decodedText;
+    if (choice == 1) {
+        ifstream in(filePath);
+        if (!in) {
+            cout << "Error opening file!\n";
+            return 1;
+        }
 
-    find_file_size(outD);
+        string text((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+
+        unordered_map<char, int> freq;
+        for (char c : text) freq[c]++;
+
+        Node* root = buildTree(freq);
+
+        unordered_map<char, string> huff;
+        generateCodes(root, "", huff);
+
+        string encodedText = encode(text, huff);
+
+        string outPath = dir + nameOnly + "Compressed.bin";
+
+        ofstream out(outPath, ios::binary);
+
+        writeFreqMap(out, freq);
+        out << encodedText.size() << "\n";
+        writeCompressed(encodedText, out);
+
+        cout << "Compressed file saved at: " << outPath << endl;
+
+        find_file_size(in);
+        find_file_size(out);
+
+        in.close();
+        out.close();
+    }
+    else if (choice == 2) {
+        ifstream in(filePath, ios::binary);
+        if (!in) {
+            cout << "Error opening file!\n";
+            return 1;
+        }
+
+        auto freq = readFreqMap(in);
+
+        int totalBits;
+        in >> totalBits;
+        in.get();
+
+        Node* root = buildTree(freq);
+
+        string bits = "";
+        char byte;
+
+        while (in.get(byte)) {
+            for (int i = 7; i >= 0; i--) {
+                if (bits.size() == totalBits) break;
+                bits += ((byte >> i) & 1) ? '1' : '0';
+            }
+        }
+
+        string decodedText = decode(bits, root);
+
+        string finalName = nameOnly;
+        string suffix = "Compressed";
+        if (finalName.size() >= suffix.size() &&
+            finalName.substr(finalName.size() - suffix.size()) == suffix) {
+            finalName = finalName.substr(0, finalName.size() - suffix.size());
+        }
+
+        string outPath = dir + filename + ".txt";
+
+        ofstream out(outPath);
+        out << decodedText;
+
+        cout << "Decompressed file saved at: " << outPath << endl;
+
+        find_file_size(out);
+
+        in.close();
+        out.close();
+    }
+    else {
+        cout << "Invalid choice!\n";
+    }
 
     return 0;
 }
-
-
 
 Node* buildTree(unordered_map<char,int>& freq){
     vector<pair<char,int>> arr(freq.begin(), freq.end());
