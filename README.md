@@ -13,10 +13,10 @@ Huffman Coding is a lossless data compression algorithm that assigns variable-le
 ## Screenshots
 
 ### Compression Output
-![Compression](screenshots/image.png)
+![Compression](screenshots/image2.png)
 
 ### Decompression Output
-![Decompression](screenshots/image2.png)
+![Decompression](screenshots/image1.png)
 
 ---
 
