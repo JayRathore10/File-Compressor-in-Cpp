@@ -11,7 +11,11 @@ struct Node{
     int freq;
     Node* left;
     Node* right;
-    Node(char c,int f){ch=c;freq=f;left=right=NULL;}
+    Node(char c,int f){
+        ch=c;
+        freq=f;
+        left=right=NULL;
+    }
 };
 
 struct Compare{
